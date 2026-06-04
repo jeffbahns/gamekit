@@ -1,0 +1,15 @@
+; Engine configuration file.
+; Gamekit — reusable Godot 4.6 component library extracted from carball.
+; Pure-script components; the demo uses default physics (no Jolt required).
+
+config_version=5
+
+[application]
+
+config/name="Gamekit"
+run/main_scene="res://demo/demo.tscn"
+config/features=PackedStringArray("4.6", "Forward Plus")
+
+[autoload]
+
+Sfx="*res://addons/gamekit/sfx/synth_sfx.gd"

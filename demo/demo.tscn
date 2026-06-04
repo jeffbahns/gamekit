@@ -1,0 +1,120 @@
+[gd_scene load_steps=16 format=3 uid="uid://gkdemoscene0001"]
+
+[ext_resource type="Script" path="res://demo/demo.gd" id="1_demo"]
+[ext_resource type="Script" path="res://addons/gamekit/motion_trail/motion_trail.gd" id="2_trail"]
+[ext_resource type="Script" path="res://addons/gamekit/camera_shake/camera_shake.gd" id="3_cam"]
+[ext_resource type="Script" path="res://addons/gamekit/impact_burst/impact_burst.gd" id="4_burst"]
+[ext_resource type="Script" path="res://addons/gamekit/tuning_panel/tuning_panel.gd" id="5_panel"]
+[ext_resource type="PackedScene" uid="uid://gkpickuppadscene01" path="res://addons/gamekit/pickup_pad/pickup_pad.tscn" id="6_pad"]
+
+[sub_resource type="PlaneMesh" id="Plane_floor"]
+size = Vector2(40, 40)
+
+[sub_resource type="StandardMaterial3D" id="Mat_floor"]
+albedo_color = Color(0.16, 0.18, 0.22, 1)
+
+[sub_resource type="BoxShape3D" id="Shape_floor"]
+size = Vector3(40, 0.2, 40)
+
+[sub_resource type="SphereShape3D" id="Shape_ball"]
+radius = 0.8
+
+[sub_resource type="SphereMesh" id="Mesh_ball"]
+radius = 0.8
+height = 1.6
+
+[sub_resource type="StandardMaterial3D" id="Mat_ball"]
+albedo_color = Color(1, 0.5, 0.2, 1)
+emission_enabled = true
+emission = Color(1, 0.45, 0.15, 1)
+emission_energy_multiplier = 0.8
+
+[sub_resource type="ProceduralSkyMaterial" id="Sky_mat"]
+
+[sub_resource type="Sky" id="Sky_env"]
+sky_material = SubResource("Sky_mat")
+
+[sub_resource type="Environment" id="Env_demo"]
+background_mode = 2
+sky = SubResource("Sky_env")
+ambient_light_source = 3
+ambient_light_energy = 1.0
+
+[node name="Demo" type="Node3D" node_paths=PackedStringArray("ball", "trail", "cam", "burst", "panel", "help_label")]
+script = ExtResource("1_demo")
+ball = NodePath("Ball")
+trail = NodePath("Ball/Trail")
+cam = NodePath("Camera3D")
+burst = NodePath("ImpactBurst")
+panel = NodePath("UI/TuningPanel")
+help_label = NodePath("UI/Help")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.7, -0.5, 0.5, 0, 0.7, 0.7, -0.7, -0.5, 0.5, 0, 12, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_demo")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+
+[node name="FloorMesh" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("Plane_floor")
+material_override = SubResource("Mat_floor")
+
+[node name="FloorCollision" type="CollisionShape3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+shape = SubResource("Shape_floor")
+
+[node name="Ball" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mass = 1.0
+
+[node name="BallCollision" type="CollisionShape3D" parent="Ball"]
+shape = SubResource("Shape_ball")
+
+[node name="BallMesh" type="MeshInstance3D" parent="Ball"]
+mesh = SubResource("Mesh_ball")
+material_override = SubResource("Mat_ball")
+
+[node name="Trail" type="GPUParticles3D" parent="Ball"]
+script = ExtResource("2_trail")
+
+[node name="Pad1" parent="." instance=ExtResource("6_pad")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.5, 0)
+amount = 10.0
+
+[node name="Pad2" parent="." instance=ExtResource("6_pad")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.5, 4)
+amount = 15.0
+
+[node name="Pad3" parent="." instance=ExtResource("6_pad")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -7)
+amount = 25.0
+respawn_s = 6.0
+big = true
+
+[node name="ImpactBurst" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+script = ExtResource("4_burst")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.7, 0.7, 0, -0.7, 0.7, 0, 14, 16)
+script = ExtResource("3_cam")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Help" type="Label" parent="UI"]
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 900.0
+offset_bottom = 32.0
+text = "Arrows: shove   `: tuning   M: mute"
+
+[node name="TuningPanel" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("5_panel")
