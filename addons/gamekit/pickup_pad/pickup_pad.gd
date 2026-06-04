@@ -70,7 +70,9 @@ func _deactivate() -> void:
 	_respawn = respawn_s
 	if mesh != null:
 		mesh.visible = false
-	monitoring = false
+	# Deferred: runs from the body_entered callback, where Godot blocks
+	# flipping monitoring directly ("Function blocked during in/out signal").
+	set_deferred("monitoring", false)
 
 func _activate() -> void:
 	_active = true
